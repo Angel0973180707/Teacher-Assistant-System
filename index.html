@@ -117,7 +117,7 @@ body {
 .nav {
   background: white;
   border-bottom: 2px solid rgba(45,106,79,0.1);
-  position: sticky; top: 73px; z-index: 90;
+  position: sticky; top: 68px; z-index: 80;
   box-shadow: 0 2px 12px rgba(0,0,0,0.06);
 }
 .nav-inner {
@@ -144,7 +144,7 @@ body {
 .nav-tab.active::after { width: 40px; }
 
 /* ── MAIN CONTENT ── */
-main { flex: 1; max-width: 900px; width: 100%; margin: 0 auto; padding: 20px 16px 100px; }
+main { flex: 1; max-width: 900px; width: 100%; margin: 0 auto; padding: 20px 16px 120px; position: relative; z-index: 1; }
 
 .page { display: none; animation: fadeUp 0.4s ease forwards; }
 .page.active { display: block; }
@@ -401,7 +401,7 @@ main { flex: 1; max-width: 900px; width: 100%; margin: 0 auto; padding: 20px 16p
 
 /* ── MODAL ── */
 .modal-overlay {
-  position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 500;
+  position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 300;
   display: none; align-items: flex-end; justify-content: center;
   backdrop-filter: blur(4px);
 }
@@ -425,7 +425,7 @@ main { flex: 1; max-width: 900px; width: 100%; margin: 0 auto; padding: 20px 16p
 .toast {
   position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%) translateY(20px);
   background: var(--jade); color: white; padding: 12px 24px; border-radius: 30px;
-  font-size: 13px; font-weight: 600; z-index: 800;
+  font-size: 13px; font-weight: 600; z-index: 400;
   opacity: 0; transition: all 0.3s ease; pointer-events: none;
   box-shadow: 0 8px 24px rgba(45,106,79,0.4);
 }
@@ -433,7 +433,7 @@ main { flex: 1; max-width: 900px; width: 100%; margin: 0 auto; padding: 20px 16p
 
 /* ── BOTTOM NAV ── */
 .bottom-nav {
-  position: fixed; bottom: 0; left: 0; right: 0; z-index: 200;
+  position: fixed; bottom: 0; left: 0; right: 0; z-index: 50;
   background: white; border-top: 2px solid rgba(45,106,79,0.1);
   box-shadow: 0 -8px 30px rgba(0,0,0,0.1);
   display: flex; justify-content: space-around; padding: 8px 0 max(8px, env(safe-area-inset-bottom));
@@ -493,7 +493,7 @@ main { flex: 1; max-width: 900px; width: 100%; margin: 0 auto; padding: 20px 16p
 /* ── RESPONSIVE ── */
 @media (min-width: 640px) {
   .bottom-nav { display: none; }
-  .nav { top: 73px; }
+  .nav { top: 68px; }
   main { padding-bottom: 40px; }
 }
 
