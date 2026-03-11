@@ -1,0 +1,1567 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#2D6A4F">
+<meta name="description" content="幸福智多星教師助理系統 - 全方位教學輔助平台">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="幸福智多星">
+<link rel="manifest" href="manifest.json">
+<title>幸福智多星 ✦ 教師助理系統</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600;700;900&family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --jade: #2D6A4F;
+  --jade-light: #40916C;
+  --jade-pale: #74C69D;
+  --cream: #F8F3E8;
+  --warm: #E9C46A;
+  --amber: #F4A261;
+  --coral: #E76F51;
+  --sky: #48CAE4;
+  --ink: #1A1A2E;
+  --mist: #F0EDE6;
+  --shadow: rgba(45, 106, 79, 0.15);
+  --gold: #D4AF37;
+  --parchment: #FAF3E0;
+  --radius: 18px;
+  --radius-sm: 10px;
+  --transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+body {
+  font-family: 'Noto Sans TC', sans-serif;
+  background: var(--cream);
+  color: var(--ink);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── SPLASH ── */
+#splash {
+  position: fixed; inset: 0; z-index: 9999;
+  background: linear-gradient(135deg, #1B4332 0%, #2D6A4F 50%, #40916C 100%);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+#splash.hide { opacity: 0; pointer-events: none; transform: scale(1.05); }
+.splash-star {
+  font-size: 72px; animation: starSpin 2s ease-in-out infinite alternate;
+  filter: drop-shadow(0 0 30px rgba(212,175,55,0.8));
+}
+@keyframes starSpin { from { transform: rotate(-15deg) scale(0.9); } to { transform: rotate(15deg) scale(1.1); } }
+.splash-title {
+  font-family: 'Noto Serif TC', serif; font-size: 32px; font-weight: 900;
+  color: var(--gold); margin: 16px 0 8px; letter-spacing: 4px;
+  text-shadow: 0 2px 20px rgba(212,175,55,0.5);
+}
+.splash-sub { color: rgba(255,255,255,0.7); font-size: 14px; letter-spacing: 2px; }
+.splash-dots { display: flex; gap: 8px; margin-top: 40px; }
+.splash-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: rgba(255,255,255,0.4);
+  animation: dotPulse 1.4s ease-in-out infinite;
+}
+.splash-dot:nth-child(2) { animation-delay: 0.2s; }
+.splash-dot:nth-child(3) { animation-delay: 0.4s; }
+@keyframes dotPulse { 0%,80%,100% { transform: scale(0.8); opacity:0.4; } 40% { transform: scale(1.2); opacity:1; } }
+
+/* ── APP SHELL ── */
+#app { display: flex; flex-direction: column; min-height: 100vh; }
+
+/* ── HEADER ── */
+.header {
+  background: linear-gradient(135deg, #1B4332 0%, #2D6A4F 100%);
+  padding: 16px 20px 12px;
+  position: sticky; top: 0; z-index: 100;
+  box-shadow: 0 4px 24px rgba(27,67,50,0.3);
+}
+.header-inner { display: flex; align-items: center; justify-content: space-between; max-width: 900px; margin: 0 auto; }
+.header-brand { display: flex; align-items: center; gap: 10px; }
+.header-icon { font-size: 28px; filter: drop-shadow(0 0 10px rgba(212,175,55,0.6)); }
+.header-text h1 {
+  font-family: 'Noto Serif TC', serif; font-size: 18px; font-weight: 900;
+  color: var(--gold); letter-spacing: 2px;
+}
+.header-text p { font-size: 11px; color: rgba(255,255,255,0.6); letter-spacing: 1px; margin-top: 1px; }
+.header-actions { display: flex; gap: 8px; }
+.header-btn {
+  background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2);
+  color: white; width: 38px; height: 38px; border-radius: 50%;
+  cursor: pointer; font-size: 16px; transition: var(--transition);
+  display: flex; align-items: center; justify-content: center;
+}
+.header-btn:hover { background: rgba(255,255,255,0.22); transform: scale(1.1); }
+
+/* ── DATE BANNER ── */
+.date-banner {
+  background: var(--parchment);
+  border-bottom: 2px solid rgba(45,106,79,0.12);
+  padding: 10px 20px;
+  display: flex; align-items: center; justify-content: space-between;
+  max-width: 900px; width: 100%; margin: 0 auto;
+}
+.date-info { font-size: 13px; color: #555; }
+.date-info strong { color: var(--jade); font-weight: 700; }
+.weather-chip {
+  background: linear-gradient(135deg, var(--sky), #023E8A);
+  color: white; padding: 4px 12px; border-radius: 20px; font-size: 12px;
+}
+
+/* ── NAV TABS ── */
+.nav {
+  background: white;
+  border-bottom: 2px solid rgba(45,106,79,0.1);
+  position: sticky; top: 73px; z-index: 90;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+}
+.nav-inner {
+  display: flex; overflow-x: auto; scrollbar-width: none;
+  max-width: 900px; margin: 0 auto; padding: 0 8px;
+}
+.nav-inner::-webkit-scrollbar { display: none; }
+.nav-tab {
+  flex: 0 0 auto; padding: 14px 16px 12px;
+  border: none; background: none; cursor: pointer;
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  transition: var(--transition); position: relative; min-width: 72px;
+  color: #888; font-family: 'Noto Sans TC', sans-serif;
+}
+.nav-tab .tab-icon { font-size: 22px; transition: var(--transition); }
+.nav-tab .tab-label { font-size: 10px; font-weight: 500; letter-spacing: 0.5px; white-space: nowrap; }
+.nav-tab.active { color: var(--jade); }
+.nav-tab.active .tab-icon { transform: scale(1.15); }
+.nav-tab::after {
+  content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+  width: 0; height: 3px; background: var(--jade); border-radius: 3px 3px 0 0;
+  transition: var(--transition);
+}
+.nav-tab.active::after { width: 40px; }
+
+/* ── MAIN CONTENT ── */
+main { flex: 1; max-width: 900px; width: 100%; margin: 0 auto; padding: 20px 16px 100px; }
+
+.page { display: none; animation: fadeUp 0.4s ease forwards; }
+.page.active { display: block; }
+@keyframes fadeUp { from { opacity:0; transform: translateY(16px); } to { opacity:1; transform: translateY(0); } }
+
+/* ── CARDS ── */
+.card {
+  background: white; border-radius: var(--radius);
+  box-shadow: 0 4px 20px var(--shadow);
+  margin-bottom: 16px; overflow: hidden;
+  border: 1px solid rgba(45,106,79,0.08);
+}
+.card-header {
+  padding: 16px 20px 14px;
+  border-bottom: 1px solid rgba(45,106,79,0.08);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.card-title {
+  font-family: 'Noto Serif TC', serif; font-size: 16px; font-weight: 700;
+  color: var(--jade); display: flex; align-items: center; gap: 8px;
+}
+.card-body { padding: 16px 20px; }
+
+/* ── SECTION TITLE ── */
+.section-title {
+  font-family: 'Noto Serif TC', serif; font-size: 20px; font-weight: 900;
+  color: var(--jade); margin-bottom: 16px;
+  display: flex; align-items: center; gap: 10px;
+}
+.section-title::after {
+  content: ''; flex: 1; height: 2px;
+  background: linear-gradient(to right, var(--jade-pale), transparent);
+  border-radius: 2px;
+}
+
+/* ── DASHBOARD GRID ── */
+.dash-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+.dash-card {
+  border-radius: var(--radius); padding: 18px 16px;
+  cursor: pointer; transition: var(--transition); position: relative; overflow: hidden;
+  border: none;
+}
+.dash-card::before {
+  content: ''; position: absolute; top: -20px; right: -20px;
+  width: 80px; height: 80px; border-radius: 50%;
+  background: rgba(255,255,255,0.12);
+}
+.dash-card:hover { transform: translateY(-3px); box-shadow: 0 12px 30px rgba(0,0,0,0.15); }
+.dash-card .dc-icon { font-size: 32px; margin-bottom: 8px; display: block; }
+.dash-card .dc-label { font-size: 12px; color: rgba(255,255,255,0.85); letter-spacing: 0.5px; }
+.dash-card .dc-value { font-size: 26px; font-weight: 900; color: white; line-height: 1.1; }
+.dc-green { background: linear-gradient(135deg, #1B4332, #2D6A4F); }
+.dc-amber { background: linear-gradient(135deg, #B5451B, #E76F51); }
+.dc-sky { background: linear-gradient(135deg, #023E8A, #48CAE4); }
+.dc-gold { background: linear-gradient(135deg, #7B5E00, #E9C46A); }
+
+/* ── QUICK ACTIONS ── */
+.quick-actions { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 16px; }
+.qa-btn {
+  background: white; border: 2px solid rgba(45,106,79,0.12);
+  border-radius: var(--radius-sm); padding: 14px 8px;
+  cursor: pointer; transition: var(--transition);
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  font-family: 'Noto Sans TC', sans-serif;
+}
+.qa-btn:hover { border-color: var(--jade); background: rgba(45,106,79,0.04); transform: translateY(-2px); }
+.qa-btn .qa-icon { font-size: 24px; }
+.qa-btn .qa-label { font-size: 11px; color: #555; font-weight: 500; text-align: center; }
+
+/* ── LESSON PLAN ── */
+.lesson-form { display: flex; flex-direction: column; gap: 14px; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.form-group { display: flex; flex-direction: column; gap: 6px; }
+.form-label { font-size: 13px; font-weight: 600; color: var(--jade); letter-spacing: 0.5px; }
+.form-input, .form-select, .form-textarea {
+  border: 2px solid rgba(45,106,79,0.2); border-radius: var(--radius-sm);
+  padding: 10px 14px; font-size: 14px; font-family: 'Noto Sans TC', sans-serif;
+  color: var(--ink); background: white; transition: var(--transition);
+  outline: none;
+}
+.form-input:focus, .form-select:focus, .form-textarea:focus {
+  border-color: var(--jade); box-shadow: 0 0 0 4px rgba(45,106,79,0.1);
+}
+.form-textarea { resize: vertical; min-height: 80px; }
+
+/* ── BUTTONS ── */
+.btn {
+  padding: 12px 24px; border-radius: var(--radius-sm); border: none;
+  cursor: pointer; font-family: 'Noto Sans TC', sans-serif; font-size: 14px; font-weight: 700;
+  transition: var(--transition); display: inline-flex; align-items: center; gap: 8px;
+  letter-spacing: 0.5px;
+}
+.btn-primary {
+  background: linear-gradient(135deg, var(--jade), var(--jade-light));
+  color: white; box-shadow: 0 4px 16px rgba(45,106,79,0.3);
+}
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(45,106,79,0.4); }
+.btn-secondary {
+  background: var(--mist); color: var(--jade); border: 2px solid rgba(45,106,79,0.2);
+}
+.btn-secondary:hover { background: rgba(45,106,79,0.08); }
+.btn-sm { padding: 8px 16px; font-size: 12px; border-radius: 8px; }
+.btn-amber { background: linear-gradient(135deg, #B5451B, var(--amber)); color: white; }
+.btn-sky { background: linear-gradient(135deg, #023E8A, var(--sky)); color: white; }
+
+/* ── STUDENT LIST ── */
+.student-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 10px; }
+.student-card {
+  background: white; border-radius: var(--radius-sm); padding: 14px 10px;
+  text-align: center; border: 2px solid transparent; cursor: pointer;
+  transition: var(--transition); box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+}
+.student-card:hover { border-color: var(--jade-pale); transform: translateY(-2px); }
+.student-card.present { border-color: var(--jade); background: rgba(45,106,79,0.04); }
+.student-card.absent { border-color: var(--coral); background: rgba(231,111,81,0.06); }
+.student-card.late { border-color: var(--warm); background: rgba(233,196,106,0.08); }
+.student-avatar {
+  width: 44px; height: 44px; border-radius: 50%; margin: 0 auto 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px; background: var(--mist);
+}
+.student-name { font-size: 12px; font-weight: 600; color: var(--ink); }
+.student-status { font-size: 10px; margin-top: 2px; }
+.status-present { color: var(--jade); }
+.status-absent { color: var(--coral); }
+.status-late { color: #B5451B; }
+
+/* ── ATTENDANCE SUMMARY ── */
+.att-summary { display: flex; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
+.att-chip {
+  padding: 8px 16px; border-radius: 20px; font-size: 13px; font-weight: 700;
+  display: flex; align-items: center; gap: 6px;
+}
+.chip-present { background: rgba(45,106,79,0.1); color: var(--jade); }
+.chip-absent { background: rgba(231,111,81,0.12); color: var(--coral); }
+.chip-late { background: rgba(233,196,106,0.2); color: #7B5E00; }
+
+/* ── COMMUNICATION ── */
+.msg-list { display: flex; flex-direction: column; gap: 12px; }
+.msg-item {
+  background: white; border-radius: var(--radius-sm); padding: 14px 16px;
+  border-left: 4px solid var(--jade); box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+  transition: var(--transition);
+}
+.msg-item:hover { transform: translateX(4px); }
+.msg-item.unread { border-left-color: var(--amber); background: rgba(233,196,106,0.05); }
+.msg-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px; }
+.msg-from { font-weight: 700; font-size: 14px; color: var(--ink); }
+.msg-time { font-size: 11px; color: #888; }
+.msg-preview { font-size: 13px; color: #555; line-height: 1.5; }
+.msg-badge {
+  display: inline-block; background: var(--amber); color: white;
+  font-size: 10px; font-weight: 700; padding: 2px 7px;
+  border-radius: 10px; margin-left: 8px;
+}
+
+/* ── PROGRESS/LEARNING ── */
+.progress-wrap { margin-bottom: 12px; }
+.progress-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+.progress-label { font-size: 13px; font-weight: 600; color: var(--ink); }
+.progress-value { font-size: 13px; font-weight: 700; color: var(--jade); }
+.progress-bar {
+  height: 10px; background: var(--mist); border-radius: 10px; overflow: hidden;
+}
+.progress-fill {
+  height: 100%; border-radius: 10px;
+  background: linear-gradient(to right, var(--jade), var(--jade-pale));
+  transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+}
+.progress-fill::after {
+  content: ''; position: absolute; right: 0; top: 50%;
+  transform: translate(50%, -50%);
+  width: 14px; height: 14px; border-radius: 50%;
+  background: var(--jade); border: 2px solid white;
+}
+
+/* ── NOTICE BOARD ── */
+.notice-item {
+  display: flex; gap: 14px; padding: 14px 0;
+  border-bottom: 1px dashed rgba(45,106,79,0.15);
+  align-items: flex-start;
+}
+.notice-item:last-child { border-bottom: none; }
+.notice-dot {
+  width: 10px; height: 10px; border-radius: 50%; margin-top: 5px; flex-shrink: 0;
+}
+.notice-content .notice-title { font-weight: 600; font-size: 14px; margin-bottom: 3px; }
+.notice-content .notice-date { font-size: 11px; color: #888; }
+
+/* ── AI CHAT ── */
+.ai-chat-wrap {
+  height: 380px; display: flex; flex-direction: column;
+  border: 2px solid rgba(45,106,79,0.15); border-radius: var(--radius-sm); overflow: hidden;
+}
+.ai-messages {
+  flex: 1; overflow-y: auto; padding: 16px;
+  background: linear-gradient(180deg, #F8F5F0 0%, white 100%);
+  display: flex; flex-direction: column; gap: 12px;
+}
+.ai-messages::-webkit-scrollbar { width: 4px; }
+.ai-messages::-webkit-scrollbar-thumb { background: rgba(45,106,79,0.3); border-radius: 4px; }
+.ai-bubble {
+  max-width: 85%; padding: 12px 16px; border-radius: 18px;
+  font-size: 13px; line-height: 1.6; animation: bubblePop 0.3s ease;
+}
+@keyframes bubblePop { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+.ai-bubble.bot {
+  background: linear-gradient(135deg, var(--jade), var(--jade-light));
+  color: white; border-bottom-left-radius: 4px;
+  box-shadow: 0 4px 12px rgba(45,106,79,0.25);
+}
+.ai-bubble.bot::before { content: '🌟 '; }
+.ai-bubble.user {
+  background: white; color: var(--ink); align-self: flex-end;
+  border-bottom-right-radius: 4px; border: 1px solid rgba(45,106,79,0.15);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+.ai-input-row {
+  display: flex; gap: 8px; padding: 12px;
+  background: white; border-top: 1px solid rgba(45,106,79,0.12);
+}
+.ai-input {
+  flex: 1; border: 2px solid rgba(45,106,79,0.2); border-radius: var(--radius-sm);
+  padding: 10px 14px; font-size: 13px; font-family: 'Noto Sans TC', sans-serif;
+  outline: none; transition: var(--transition);
+}
+.ai-input:focus { border-color: var(--jade); }
+.ai-send {
+  background: linear-gradient(135deg, var(--jade), var(--jade-light));
+  color: white; border: none; border-radius: var(--radius-sm);
+  padding: 10px 16px; cursor: pointer; font-size: 18px;
+  transition: var(--transition);
+}
+.ai-send:hover { transform: scale(1.05); }
+.ai-thinking { display: flex; gap: 4px; align-items: center; padding: 12px 16px; }
+.think-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--jade-pale); animation: think 1s ease-in-out infinite;
+}
+.think-dot:nth-child(2) { animation-delay: 0.2s; }
+.think-dot:nth-child(3) { animation-delay: 0.4s; }
+@keyframes think { 0%,80%,100% { transform: scale(0.6); } 40% { transform: scale(1); } }
+
+/* ── QUICK PROMPTS ── */
+.quick-prompts { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+.qp-chip {
+  background: rgba(45,106,79,0.08); border: 1px solid rgba(45,106,79,0.2);
+  color: var(--jade); padding: 6px 14px; border-radius: 20px; font-size: 12px;
+  cursor: pointer; transition: var(--transition); font-family: 'Noto Sans TC', sans-serif;
+  white-space: nowrap;
+}
+.qp-chip:hover { background: var(--jade); color: white; }
+
+/* ── MODAL ── */
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 500;
+  display: none; align-items: flex-end; justify-content: center;
+  backdrop-filter: blur(4px);
+}
+.modal-overlay.open { display: flex; }
+.modal {
+  background: white; border-radius: var(--radius) var(--radius) 0 0;
+  width: 100%; max-width: 640px; max-height: 85vh; overflow-y: auto;
+  padding: 24px 20px 40px; animation: slideUp 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+@keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+.modal-handle {
+  width: 40px; height: 4px; background: #DDD; border-radius: 4px;
+  margin: 0 auto 20px;
+}
+.modal-title {
+  font-family: 'Noto Serif TC', serif; font-size: 20px; font-weight: 900;
+  color: var(--jade); margin-bottom: 20px;
+}
+
+/* ── TOAST ── */
+.toast {
+  position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%) translateY(20px);
+  background: var(--jade); color: white; padding: 12px 24px; border-radius: 30px;
+  font-size: 13px; font-weight: 600; z-index: 800;
+  opacity: 0; transition: all 0.3s ease; pointer-events: none;
+  box-shadow: 0 8px 24px rgba(45,106,79,0.4);
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* ── BOTTOM NAV ── */
+.bottom-nav {
+  position: fixed; bottom: 0; left: 0; right: 0; z-index: 200;
+  background: white; border-top: 2px solid rgba(45,106,79,0.1);
+  box-shadow: 0 -8px 30px rgba(0,0,0,0.1);
+  display: flex; justify-content: space-around; padding: 8px 0 max(8px, env(safe-area-inset-bottom));
+}
+.bnav-btn {
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
+  border: none; background: none; cursor: pointer; padding: 4px 12px;
+  transition: var(--transition); color: #AAA; font-family: 'Noto Sans TC', sans-serif;
+  position: relative;
+}
+.bnav-btn .bi { font-size: 24px; transition: var(--transition); }
+.bnav-btn .bl { font-size: 10px; font-weight: 500; }
+.bnav-btn.active { color: var(--jade); }
+.bnav-btn.active .bi { transform: scale(1.15); }
+.bnav-badge {
+  position: absolute; top: 0; right: 8px;
+  background: var(--coral); color: white;
+  width: 18px; height: 18px; border-radius: 50%;
+  font-size: 10px; font-weight: 900; display: flex; align-items: center; justify-content: center;
+  border: 2px solid white;
+}
+
+/* ── CALENDAR STRIP ── */
+.cal-strip { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; margin-bottom: 16px; padding-bottom: 4px; }
+.cal-strip::-webkit-scrollbar { display: none; }
+.cal-day {
+  flex: 0 0 52px; background: white; border: 2px solid rgba(45,106,79,0.12);
+  border-radius: var(--radius-sm); padding: 10px 6px; text-align: center;
+  cursor: pointer; transition: var(--transition);
+}
+.cal-day.today { background: var(--jade); border-color: var(--jade); color: white; }
+.cal-day.has-event { border-color: var(--amber); }
+.cal-day .cal-wd { font-size: 10px; font-weight: 600; opacity: 0.7; letter-spacing: 0.5px; }
+.cal-day .cal-date { font-size: 18px; font-weight: 900; margin: 4px 0; }
+.cal-day .cal-dot { width: 5px; height: 5px; background: var(--amber); border-radius: 50%; margin: 0 auto; }
+.cal-day.today .cal-dot { background: white; }
+
+/* ── TAG ── */
+.tag {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600;
+}
+.tag-green { background: rgba(45,106,79,0.1); color: var(--jade); }
+.tag-amber { background: rgba(233,196,106,0.2); color: #7B5E00; }
+.tag-coral { background: rgba(231,111,81,0.12); color: #B5451B; }
+.tag-sky { background: rgba(72,202,228,0.15); color: #023E8A; }
+
+/* ── STATS ── */
+.stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 16px; }
+.stat-box {
+  background: white; border-radius: var(--radius-sm); padding: 14px 12px; text-align: center;
+  border: 1px solid rgba(45,106,79,0.1); box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+.stat-box .stat-num { font-family: 'Noto Serif TC', serif; font-size: 28px; font-weight: 900; color: var(--jade); }
+.stat-box .stat-label { font-size: 11px; color: #888; margin-top: 2px; }
+
+/* ── RESPONSIVE ── */
+@media (min-width: 640px) {
+  .bottom-nav { display: none; }
+  .nav { top: 73px; }
+  main { padding-bottom: 40px; }
+}
+
+/* ── UTILITIES ── */
+.flex { display: flex; }
+.items-center { align-items: center; }
+.gap-2 { gap: 8px; }
+.gap-3 { gap: 12px; }
+.mb-3 { margin-bottom: 12px; }
+.mb-4 { margin-bottom: 16px; }
+.text-sm { font-size: 13px; }
+.text-muted { color: #888; }
+.font-bold { font-weight: 700; }
+.w-full { width: 100%; }
+.mt-3 { margin-top: 12px; }
+</style>
+</head>
+
+<body>
+<!-- Splash Screen -->
+<div id="splash">
+  <div class="splash-star">⭐</div>
+  <div class="splash-title">幸福智多星</div>
+  <div class="splash-sub">全方位教師助理系統</div>
+  <div class="splash-dots">
+    <div class="splash-dot"></div>
+    <div class="splash-dot"></div>
+    <div class="splash-dot"></div>
+  </div>
+</div>
+
+<div id="app">
+  <!-- Header -->
+  <header class="header">
+    <div class="header-inner">
+      <div class="header-brand">
+        <div class="header-icon">⭐</div>
+        <div class="header-text">
+          <h1>幸福智多星</h1>
+          <p>全方位教師助理系統</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button class="header-btn" onclick="showToast('🔔 通知功能已開啟')">🔔</button>
+        <button class="header-btn" onclick="openSettingsModal()">⚙️</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Nav Tabs -->
+  <nav class="nav">
+    <div class="nav-inner">
+      <button class="nav-tab active" onclick="switchPage('dashboard', this)">
+        <span class="tab-icon">🏠</span>
+        <span class="tab-label">總覽</span>
+      </button>
+      <button class="nav-tab" onclick="switchPage('lesson', this)">
+        <span class="tab-icon">📚</span>
+        <span class="tab-label">備課</span>
+      </button>
+      <button class="nav-tab" onclick="switchPage('classroom', this)">
+        <span class="tab-icon">🏫</span>
+        <span class="tab-label">班級</span>
+      </button>
+      <button class="nav-tab" onclick="switchPage('guidance', this)">
+        <span class="tab-icon">📊</span>
+        <span class="tab-label">輔導</span>
+      </button>
+      <button class="nav-tab" onclick="switchPage('communication', this)">
+        <span class="tab-icon">💬</span>
+        <span class="tab-label">親師</span>
+      </button>
+      <button class="nav-tab" onclick="switchPage('ai', this)">
+        <span class="tab-icon">🤖</span>
+        <span class="tab-label">AI助理</span>
+      </button>
+    </div>
+  </nav>
+
+  <main>
+    <!-- ═══════════════ DASHBOARD PAGE ═══════════════ -->
+    <div id="page-dashboard" class="page active">
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:16px;">
+        <div>
+          <div style="font-size:13px; color:#888;">今天是</div>
+          <div style="font-family:'Noto Serif TC',serif; font-size:22px; font-weight:900; color:var(--jade);" id="today-date">載入中...</div>
+        </div>
+        <div style="text-align:right;">
+          <div style="font-size:12px; color:#888;">授課班級</div>
+          <div style="font-size:18px; font-weight:700; color:var(--jade);">五年一班</div>
+        </div>
+      </div>
+
+      <!-- Stats -->
+      <div class="dash-grid">
+        <div class="dash-card dc-green" onclick="switchPage('classroom', document.querySelector('[onclick*=classroom]'))">
+          <span class="dc-icon">👨‍🎓</span>
+          <div class="dc-value">32</div>
+          <div class="dc-label">班級人數</div>
+        </div>
+        <div class="dash-card dc-amber" onclick="switchPage('lesson', document.querySelector('[onclick*=lesson]'))">
+          <span class="dc-icon">📝</span>
+          <div class="dc-value">5</div>
+          <div class="dc-label">本週課程</div>
+        </div>
+        <div class="dash-card dc-sky" onclick="switchPage('communication', document.querySelector('[onclick*=communication]'))">
+          <span class="dc-icon">📨</span>
+          <div class="dc-value">3</div>
+          <div class="dc-label">未讀訊息</div>
+        </div>
+        <div class="dash-card dc-gold" onclick="switchPage('guidance', document.querySelector('[onclick*=guidance]'))">
+          <span class="dc-icon">⭐</span>
+          <div class="dc-value">88%</div>
+          <div class="dc-label">學習達成率</div>
+        </div>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="section-title">⚡ 快速功能</div>
+      <div class="quick-actions">
+        <button class="qa-btn" onclick="openAttendanceModal()">
+          <span class="qa-icon">✅</span>
+          <span class="qa-label">點名簽到</span>
+        </button>
+        <button class="qa-btn" onclick="switchPage('lesson', document.querySelector('[onclick*=lesson]'))">
+          <span class="qa-icon">📖</span>
+          <span class="qa-label">新增備課</span>
+        </button>
+        <button class="qa-btn" onclick="openMessageModal()">
+          <span class="qa-icon">📢</span>
+          <span class="qa-label">發送通知</span>
+        </button>
+        <button class="qa-btn" onclick="switchPage('ai', document.querySelector('[onclick*=ai]'))">
+          <span class="qa-icon">🤖</span>
+          <span class="qa-label">AI諮詢</span>
+        </button>
+      </div>
+
+      <!-- Calendar -->
+      <div class="section-title">📅 本週行事</div>
+      <div class="cal-strip" id="cal-strip"></div>
+
+      <!-- Today Schedule -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">📋 今日課表</div>
+          <button class="btn btn-secondary btn-sm" onclick="switchPage('lesson', document.querySelector('[onclick*=lesson]'))">查看備課</button>
+        </div>
+        <div class="card-body">
+          <div id="today-schedule"></div>
+        </div>
+      </div>
+
+      <!-- Notice Board -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">📌 公告事項</div>
+          <button class="btn btn-secondary btn-sm" onclick="openNoticeModal()">＋ 新增</button>
+        </div>
+        <div class="card-body" id="notice-board"></div>
+      </div>
+    </div>
+
+    <!-- ═══════════════ LESSON PAGE ═══════════════ -->
+    <div id="page-lesson" class="page">
+      <div class="section-title">📚 備課管理</div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">✏️ 新增教案</div>
+        </div>
+        <div class="card-body">
+          <div class="lesson-form">
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">科目</label>
+                <select class="form-select" id="ls-subject">
+                  <option>國語</option><option>數學</option><option>自然</option>
+                  <option>社會</option><option>英語</option><option>體育</option>
+                  <option>藝術</option><option>綜合活動</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">教學日期</label>
+                <input type="date" class="form-input" id="ls-date">
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">單元名稱</label>
+              <input type="text" class="form-input" id="ls-title" placeholder="輸入本次教學單元">
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">教學目標</label>
+                <textarea class="form-textarea" id="ls-goal" placeholder="學生能夠..."></textarea>
+              </div>
+              <div class="form-group">
+                <label class="form-label">教學方法</label>
+                <textarea class="form-textarea" id="ls-method" placeholder="講述法、合作學習..."></textarea>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">教學活動流程</label>
+              <textarea class="form-textarea" id="ls-flow" placeholder="引起動機 → 教學活動 → 評量..." style="min-height:100px;"></textarea>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">教學資源</label>
+                <input type="text" class="form-input" id="ls-resource" placeholder="課本、學習單...">
+              </div>
+              <div class="form-group">
+                <label class="form-label">評量方式</label>
+                <input type="text" class="form-input" id="ls-eval" placeholder="口頭問答、實作...">
+              </div>
+            </div>
+            <div style="display:flex; gap:10px; flex-wrap:wrap;">
+              <button class="btn btn-primary" onclick="saveLessonPlan()">💾 儲存教案</button>
+              <button class="btn btn-sky" onclick="aiGenerateLesson()">🤖 AI輔助生成</button>
+              <button class="btn btn-secondary" onclick="clearLessonForm()">🗑️ 清除</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Saved Lessons -->
+      <div class="section-title">📋 已存教案</div>
+      <div id="lesson-list"></div>
+    </div>
+
+    <!-- ═══════════════ CLASSROOM PAGE ═══════════════ -->
+    <div id="page-classroom" class="page">
+      <div class="section-title">🏫 班級經營</div>
+
+      <!-- Attendance -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">✅ 今日出席</div>
+          <div style="display:flex; gap:8px;">
+            <button class="btn btn-primary btn-sm" onclick="markAllPresent()">全到</button>
+            <button class="btn btn-secondary btn-sm" onclick="openAttendanceModal()">管理</button>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="att-summary">
+            <div class="att-chip chip-present">✅ 出席 <strong id="cnt-present">30</strong></div>
+            <div class="att-chip chip-absent">❌ 缺席 <strong id="cnt-absent">1</strong></div>
+            <div class="att-chip chip-late">⏰ 遲到 <strong id="cnt-late">1</strong></div>
+          </div>
+          <div class="student-grid" id="student-grid"></div>
+        </div>
+      </div>
+
+      <!-- Class Rules -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">📜 班規與獎懲</div>
+          <button class="btn btn-secondary btn-sm" onclick="openRulesModal()">編輯</button>
+        </div>
+        <div class="card-body">
+          <div id="class-rules-list"></div>
+        </div>
+      </div>
+
+      <!-- Seating -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">💺 座位安排</div>
+          <button class="btn btn-primary btn-sm" onclick="shuffleSeats()">🔀 隨機排座</button>
+        </div>
+        <div class="card-body">
+          <div style="font-size:13px; color:#888; text-align:center; padding:20px;">
+            🖥️ 點擊「隨機排座」可自動分配座位<br>
+            <button class="btn btn-secondary btn-sm mt-3" onclick="showToast('座位表功能開啟中...')">📋 查看座位表</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════ GUIDANCE PAGE ═══════════════ -->
+    <div id="page-guidance" class="page">
+      <div class="section-title">📊 學習輔導</div>
+
+      <!-- Overall Stats -->
+      <div class="stats-row">
+        <div class="stat-box">
+          <div class="stat-num">88%</div>
+          <div class="stat-label">平均達成率</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-num">26</div>
+          <div class="stat-label">達標人數</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-num">6</div>
+          <div class="stat-label">需輔導</div>
+        </div>
+      </div>
+
+      <!-- Subject Progress -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">📈 各科學習進度</div>
+        </div>
+        <div class="card-body">
+          <div id="subject-progress"></div>
+        </div>
+      </div>
+
+      <!-- Students needing attention -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">🔍 需要關注學生</div>
+          <button class="btn btn-amber btn-sm" onclick="openGuidanceModal()">新增記錄</button>
+        </div>
+        <div class="card-body">
+          <div id="attention-students"></div>
+        </div>
+      </div>
+
+      <!-- Learning Records -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">📝 輔導記錄</div>
+        </div>
+        <div class="card-body">
+          <div id="guidance-records"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════ COMMUNICATION PAGE ═══════════════ -->
+    <div id="page-communication" class="page">
+      <div class="section-title">💬 親師溝通</div>
+
+      <div style="display:flex; gap:10px; margin-bottom:16px; flex-wrap:wrap;">
+        <button class="btn btn-primary" onclick="openMessageModal()">📢 群發通知</button>
+        <button class="btn btn-sky" onclick="openIndividualMsg()">✉️ 個別訊息</button>
+        <button class="btn btn-amber" onclick="openEventModal()">📅 活動邀請</button>
+      </div>
+
+      <!-- Messages -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">📬 訊息匣</div>
+          <span class="tag tag-coral">3 未讀</span>
+        </div>
+        <div class="card-body">
+          <div class="msg-list" id="msg-list"></div>
+        </div>
+      </div>
+
+      <!-- Templates -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">📋 常用通知範本</div>
+        </div>
+        <div class="card-body">
+          <div id="msg-templates"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════ AI PAGE ═══════════════ -->
+    <div id="page-ai" class="page">
+      <div class="section-title">🤖 AI 教學助理</div>
+
+      <div class="card" style="margin-bottom:12px;">
+        <div class="card-body" style="padding:12px 16px;">
+          <div style="display:flex; align-items:center; gap:10px;">
+            <div style="width:48px; height:48px; background:linear-gradient(135deg,var(--jade),var(--jade-light)); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:24px; flex-shrink:0;">🌟</div>
+            <div>
+              <div style="font-family:'Noto Serif TC',serif; font-weight:700; color:var(--jade); font-size:15px;">智多星 AI</div>
+              <div style="font-size:12px; color:#888;">您的專屬教學夥伴，隨時提供專業建議</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Prompts -->
+      <div class="section-title" style="font-size:15px;">💡 快速詢問</div>
+      <div class="quick-prompts">
+        <button class="qp-chip" onclick="sendQuickPrompt('幫我設計一個國語課的遊戲活動')">📖 設計教學遊戲</button>
+        <button class="qp-chip" onclick="sendQuickPrompt('請給我處理班級秩序問題的建議')">🏫 班級秩序建議</button>
+        <button class="qp-chip" onclick="sendQuickPrompt('如何與家長溝通孩子的學習問題')">👨‍👩‍👧 親師溝通技巧</button>
+        <button class="qp-chip" onclick="sendQuickPrompt('幫我生成一份數學評量試題')">📝 生成評量題目</button>
+        <button class="qp-chip" onclick="sendQuickPrompt('如何幫助學習落後的學生追上進度')">💪 學習輔導策略</button>
+        <button class="qp-chip" onclick="sendQuickPrompt('請推薦適合五年級的班會主題')">🤝 班會主題建議</button>
+      </div>
+
+      <!-- Chat Interface -->
+      <div class="ai-chat-wrap">
+        <div class="ai-messages" id="ai-messages">
+          <div class="ai-bubble bot">您好！我是智多星 AI 教學助理 🌟<br>我可以協助您備課設計、班級經營、學習輔導，以及親師溝通等各種教學事務。請問有什麼我可以幫您的嗎？</div>
+        </div>
+        <div class="ai-input-row">
+          <input type="text" class="ai-input" id="ai-input" placeholder="輸入您的問題..." onkeypress="if(event.key==='Enter') sendAiMessage()">
+          <button class="ai-send" onclick="sendAiMessage()">➤</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Bottom Navigation -->
+  <nav class="bottom-nav">
+    <button class="bnav-btn active" onclick="switchPage('dashboard', this)" id="bnav-dashboard">
+      <span class="bi">🏠</span>
+      <span class="bl">總覽</span>
+    </button>
+    <button class="bnav-btn" onclick="switchPage('lesson', this)" id="bnav-lesson">
+      <span class="bi">📚</span>
+      <span class="bl">備課</span>
+    </button>
+    <button class="bnav-btn" onclick="switchPage('classroom', this)" id="bnav-classroom">
+      <span class="bi">🏫</span>
+      <span class="bl">班級</span>
+    </button>
+    <button class="bnav-btn" onclick="switchPage('guidance', this)" id="bnav-guidance">
+      <span class="bi">📊</span>
+      <span class="bl">輔導</span>
+    </button>
+    <button class="bnav-btn" onclick="switchPage('communication', this)" id="bnav-communication">
+      <span class="bi">💬</span>
+      <span class="bl">親師</span>
+      <span class="bnav-badge">3</span>
+    </button>
+    <button class="bnav-btn" onclick="switchPage('ai', this)" id="bnav-ai">
+      <span class="bi">🤖</span>
+      <span class="bl">AI</span>
+    </button>
+  </nav>
+</div>
+
+<!-- Modals -->
+<div class="modal-overlay" id="modal-attendance" onclick="closeModal('attendance')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-handle"></div>
+    <div class="modal-title">✅ 出席管理</div>
+    <div class="att-summary">
+      <div class="att-chip chip-present">✅ <strong id="m-present">30</strong></div>
+      <div class="att-chip chip-absent">❌ <strong id="m-absent">1</strong></div>
+      <div class="att-chip chip-late">⏰ <strong id="m-late">1</strong></div>
+    </div>
+    <div class="student-grid mt-3" id="modal-student-grid" style="margin-top:16px;"></div>
+    <div style="display:flex; gap:10px; margin-top:20px; flex-wrap:wrap;">
+      <button class="btn btn-primary" onclick="saveAttendance()">💾 儲存</button>
+      <button class="btn btn-secondary" onclick="closeModal('attendance')">取消</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-message" onclick="closeModal('message')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-handle"></div>
+    <div class="modal-title">📢 發送通知</div>
+    <div class="lesson-form">
+      <div class="form-group">
+        <label class="form-label">通知對象</label>
+        <select class="form-select" id="msg-target">
+          <option>全班家長</option><option>部分學生家長</option><option>班親會</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">通知主旨</label>
+        <input type="text" class="form-input" id="msg-subject" placeholder="輸入主旨">
+      </div>
+      <div class="form-group">
+        <label class="form-label">通知內容</label>
+        <textarea class="form-textarea" id="msg-content" placeholder="輸入通知內容..." style="min-height:120px;"></textarea>
+      </div>
+      <div style="display:flex; gap:10px; flex-wrap:wrap;">
+        <button class="btn btn-primary" onclick="sendMessage()">📤 發送</button>
+        <button class="btn btn-secondary" onclick="closeModal('message')">取消</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-guidance" onclick="closeModal('guidance')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-handle"></div>
+    <div class="modal-title">📝 新增輔導記錄</div>
+    <div class="lesson-form">
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">學生姓名</label>
+          <input type="text" class="form-input" id="gd-student" placeholder="學生姓名">
+        </div>
+        <div class="form-group">
+          <label class="form-label">輔導日期</label>
+          <input type="date" class="form-input" id="gd-date">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">輔導類型</label>
+        <select class="form-select" id="gd-type">
+          <option>學業輔導</option><option>行為輔導</option><option>情緒輔導</option>
+          <option>人際關係</option><option>其他</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">輔導內容</label>
+        <textarea class="form-textarea" id="gd-content" placeholder="記錄輔導情況..."></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">後續追蹤</label>
+        <textarea class="form-textarea" id="gd-followup" placeholder="下次追蹤重點..."></textarea>
+      </div>
+      <div style="display:flex; gap:10px;">
+        <button class="btn btn-primary" onclick="saveGuidance()">💾 儲存</button>
+        <button class="btn btn-secondary" onclick="closeModal('guidance')">取消</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-notice" onclick="closeModal('notice')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-handle"></div>
+    <div class="modal-title">📌 新增公告</div>
+    <div class="lesson-form">
+      <div class="form-group">
+        <label class="form-label">公告標題</label>
+        <input type="text" class="form-input" id="nt-title" placeholder="公告標題">
+      </div>
+      <div class="form-group">
+        <label class="form-label">公告內容</label>
+        <textarea class="form-textarea" id="nt-content" placeholder="詳細說明..."></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">重要程度</label>
+        <select class="form-select" id="nt-level">
+          <option value="normal">一般</option><option value="important">重要</option><option value="urgent">緊急</option>
+        </select>
+      </div>
+      <div style="display:flex; gap:10px;">
+        <button class="btn btn-primary" onclick="saveNotice()">📌 發布</button>
+        <button class="btn btn-secondary" onclick="closeModal('notice')">取消</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-settings" onclick="closeModal('settings')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-handle"></div>
+    <div class="modal-title">⚙️ 系統設定</div>
+    <div class="lesson-form">
+      <div class="form-group">
+        <label class="form-label">教師姓名</label>
+        <input type="text" class="form-input" id="set-name" value="王老師">
+      </div>
+      <div class="form-group">
+        <label class="form-label">班級名稱</label>
+        <input type="text" class="form-input" id="set-class" value="五年一班">
+      </div>
+      <div class="form-group">
+        <label class="form-label">學校名稱</label>
+        <input type="text" class="form-input" id="set-school" value="幸福國小">
+      </div>
+      <div class="form-group">
+        <label class="form-label">學年度</label>
+        <input type="text" class="form-input" id="set-year" value="114學年度">
+      </div>
+      <div style="display:flex; gap:10px;">
+        <button class="btn btn-primary" onclick="saveSettings()">💾 儲存設定</button>
+        <button class="btn btn-secondary" onclick="closeModal('settings')">取消</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ══════════════════════════════════════════════
+// DATA STORE
+// ══════════════════════════════════════════════
+const store = {
+  students: [
+    {id:1,name:'王小明',avatar:'👦',status:'present'},
+    {id:2,name:'李美玲',avatar:'👧',status:'present'},
+    {id:3,name:'張大偉',avatar:'👦',status:'absent'},
+    {id:4,name:'陳雅婷',avatar:'👧',status:'present'},
+    {id:5,name:'林建宏',avatar:'👦',status:'late'},
+    {id:6,name:'黃淑惠',avatar:'👧',status:'present'},
+    {id:7,name:'吳志明',avatar:'👦',status:'present'},
+    {id:8,name:'劉佳欣',avatar:'👧',status:'present'},
+    {id:9,name:'楊文豪',avatar:'👦',status:'present'},
+    {id:10,name:'蔡雨潔',avatar:'👧',status:'present'},
+    {id:11,name:'許宗翰',avatar:'👦',status:'present'},
+    {id:12,name:'鄭心怡',avatar:'👧',status:'present'},
+  ],
+  lessons: [
+    {id:1, subject:'國語', date:'2026-03-11', title:'第六課：春天的信', goal:'能朗讀課文並理解文意', status:'完成'},
+    {id:2, subject:'數學', date:'2026-03-12', title:'分數的加法', goal:'能計算同分母分數加法', status:'進行中'},
+  ],
+  notices: [
+    {id:1, title:'校外教學說明', content:'本月26日前往科博館', level:'important', date:'03/10'},
+    {id:2, title:'運動會排練', content:'本週四下午全校排練', level:'normal', date:'03/09'},
+    {id:3, title:'緊急停課通知', content:'明日停課一天，請家長安排', level:'urgent', date:'03/08'},
+  ],
+  messages: [
+    {id:1, from:'王小明爸爸', preview:'請問明天校外教學需要自備午餐嗎？', time:'10:30', unread:true},
+    {id:2, from:'李美玲媽媽', preview:'小美玲今天感冒了，下午請假一節...',  time:'09:15', unread:true},
+    {id:3, from:'班親會會長', preview:'下週班親會議程確認，請老師確認時間', time:'昨天', unread:true},
+    {id:4, from:'張大偉爸爸', preview:'謝謝老師上次的關心，大偉最近進步很多！', time:'03/09', unread:false},
+  ],
+  guidance: [
+    {student:'張大偉', type:'學業輔導', date:'2026-03-08', content:'數學加法單元理解困難，進行個別指導', followup:'下週測驗追蹤'},
+    {student:'林建宏', type:'行為輔導', date:'2026-03-07', content:'上課注意力不集中，與家長電話溝通', followup:'持續觀察'},
+  ],
+  schedule: [
+    {period:'第一節', time:'08:10-08:55', subject:'國語', color:'#2D6A4F'},
+    {period:'第二節', time:'09:05-09:50', subject:'數學', color:'#E76F51'},
+    {period:'第三節', time:'10:10-10:55', subject:'自然', color:'#48CAE4'},
+    {period:'第四節', time:'11:05-11:50', subject:'社會', color:'#E9C46A'},
+    {period:'第五節', time:'13:10-13:55', subject:'英語', color:'#40916C'},
+    {period:'第六節', time:'14:05-14:50', subject:'體育', color:'#F4A261'},
+  ],
+  templates: [
+    {id:1, title:'作業提醒', content:'親愛的家長您好，本週作業請在週五前完成，謝謝配合！'},
+    {id:2, title:'校外教學通知', content:'本班將於 [日期] 前往 [地點] 進行校外教學活動，請準備...'},
+    {id:3, title:'成績通知', content:'本次定期評量成績已出，請至學校系統查閱，如有疑問請聯絡老師。'},
+    {id:4, title:'行為關注', content:'您的孩子最近在學校 [狀況]，希望能與您溝通，方便時請與老師聯絡。'},
+  ]
+};
+
+const subjectProgress = [
+  {subject:'國語', progress:92, color:'var(--jade)'},
+  {subject:'數學', progress:78, color:'var(--amber)'},
+  {subject:'自然', progress:85, color:'var(--sky)'},
+  {subject:'社會', progress:90, color:'var(--warm)'},
+  {subject:'英語', progress:72, color:'var(--coral)'},
+];
+
+const classRules = [
+  {icon:'🤫', rule:'上課專心聽講，舉手發言'},
+  {icon:'📚', rule:'按時完成作業，準時繳交'},
+  {icon:'🤝', rule:'尊重師長同學，和睦相處'},
+  {icon:'🏫', rule:'保持教室整潔，愛護公物'},
+  {icon:'⭐', rule:'積極參與活動，樂於助人'},
+];
+
+// ══════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    document.getElementById('splash').classList.add('hide');
+  }, 2000);
+
+  initDate();
+  initCalendar();
+  initSchedule();
+  initNotices();
+  initStudentGrid();
+  initMessages();
+  initGuidance();
+  initLessons();
+  initSubjectProgress();
+  initClassRules();
+  initTemplates();
+
+  // Set today's date on lesson form
+  document.getElementById('ls-date').value = new Date().toISOString().split('T')[0];
+  document.getElementById('gd-date').value = new Date().toISOString().split('T')[0];
+});
+
+function initDate() {
+  const now = new Date();
+  const days = ['日','一','二','三','四','五','六'];
+  const months = now.getMonth() + 1;
+  const date = now.getDate();
+  const day = days[now.getDay()];
+  document.getElementById('today-date').textContent = `${months}月${date}日 星期${day}`;
+}
+
+function initCalendar() {
+  const strip = document.getElementById('cal-strip');
+  const now = new Date();
+  const days = ['日','一','二','三','四','五','六'];
+  for (let i = -1; i <= 5; i++) {
+    const d = new Date(now);
+    d.setDate(now.getDate() + i);
+    const isToday = i === 0;
+    const hasEvent = [0, 2, 4].includes(i);
+    strip.innerHTML += `
+      <div class="cal-day ${isToday ? 'today' : ''} ${hasEvent && !isToday ? 'has-event' : ''}">
+        <div class="cal-wd">${days[d.getDay()]}</div>
+        <div class="cal-date">${d.getDate()}</div>
+        ${hasEvent ? '<div class="cal-dot"></div>' : '<div style="height:5px;"></div>'}
+      </div>`;
+  }
+}
+
+function initSchedule() {
+  const el = document.getElementById('today-schedule');
+  el.innerHTML = store.schedule.map(s => `
+    <div style="display:flex; align-items:center; gap:12px; padding:10px 0; border-bottom:1px dashed rgba(45,106,79,0.1);">
+      <div style="width:6px; height:40px; background:${s.color}; border-radius:4px; flex-shrink:0;"></div>
+      <div style="flex:1;">
+        <div style="font-weight:700; font-size:14px;">${s.subject}</div>
+        <div style="font-size:11px; color:#888;">${s.period} · ${s.time}</div>
+      </div>
+      <span class="tag tag-green" style="font-size:10px;">${s.period}</span>
+    </div>`).join('');
+}
+
+function initNotices() {
+  const colors = {normal: '#2D6A4F', important: '#E9C46A', urgent: '#E76F51'};
+  const labels = {normal: '一般', important: '重要', urgent: '緊急'};
+  document.getElementById('notice-board').innerHTML = store.notices.map(n => `
+    <div class="notice-item">
+      <div class="notice-dot" style="background:${colors[n.level]};"></div>
+      <div class="notice-content" style="flex:1;">
+        <div class="notice-title">${n.title} <span class="tag" style="background:${colors[n.level]}22; color:${colors[n.level]}; font-size:10px;">${labels[n.level]}</span></div>
+        <div style="font-size:12px; color:#666; margin-top:2px;">${n.content}</div>
+        <div class="notice-date">${n.date}</div>
+      </div>
+    </div>`).join('');
+}
+
+function initStudentGrid(targetId = 'student-grid') {
+  const el = document.getElementById(targetId);
+  if (!el) return;
+  el.innerHTML = store.students.map(s => `
+    <div class="student-card ${s.status}" onclick="cycleStudentStatus(${s.id}, '${targetId}')" id="sc-${targetId}-${s.id}">
+      <div class="student-avatar">${s.avatar}</div>
+      <div class="student-name">${s.name}</div>
+      <div class="student-status status-${s.status}">${s.status === 'present' ? '✅' : s.status === 'absent' ? '❌' : '⏰'}</div>
+    </div>`).join('');
+  updateAttendanceCounts();
+}
+
+function cycleStudentStatus(id, gridId) {
+  const s = store.students.find(s => s.id === id);
+  const order = ['present', 'absent', 'late'];
+  s.status = order[(order.indexOf(s.status) + 1) % 3];
+  const card = document.getElementById(`sc-${gridId}-${id}`);
+  card.className = `student-card ${s.status}`;
+  card.querySelector('.student-status').textContent = s.status === 'present' ? '✅' : s.status === 'absent' ? '❌' : '⏰';
+  card.querySelector('.student-status').className = `student-status status-${s.status}`;
+  updateAttendanceCounts();
+}
+
+function updateAttendanceCounts() {
+  const p = store.students.filter(s=>s.status==='present').length;
+  const a = store.students.filter(s=>s.status==='absent').length;
+  const l = store.students.filter(s=>s.status==='late').length;
+  ['cnt-present','m-present'].forEach(id => { if(document.getElementById(id)) document.getElementById(id).textContent = p; });
+  ['cnt-absent','m-absent'].forEach(id => { if(document.getElementById(id)) document.getElementById(id).textContent = a; });
+  ['cnt-late','m-late'].forEach(id => { if(document.getElementById(id)) document.getElementById(id).textContent = l; });
+}
+
+function markAllPresent() {
+  store.students.forEach(s => s.status = 'present');
+  initStudentGrid();
+  initStudentGrid('modal-student-grid');
+  showToast('✅ 全體出席已標記');
+}
+
+function initMessages() {
+  document.getElementById('msg-list').innerHTML = store.messages.map(m => `
+    <div class="msg-item ${m.unread ? 'unread' : ''}">
+      <div class="msg-header">
+        <div class="msg-from">${m.from} ${m.unread ? '<span class="msg-badge">新</span>' : ''}</div>
+        <div class="msg-time">${m.time}</div>
+      </div>
+      <div class="msg-preview">${m.preview}</div>
+      <div style="display:flex; gap:8px; margin-top:8px;">
+        <button class="btn btn-primary btn-sm" onclick="replyMsg(${m.id})">↩ 回覆</button>
+        ${m.unread ? `<button class="btn btn-secondary btn-sm" onclick="markRead(${m.id})">已讀</button>` : ''}
+      </div>
+    </div>`).join('');
+}
+
+function markRead(id) {
+  const m = store.messages.find(m => m.id === id);
+  if (m) { m.unread = false; initMessages(); }
+}
+
+function replyMsg(id) {
+  const m = store.messages.find(m => m.id === id);
+  document.getElementById('msg-subject').value = `RE: 回覆${m.from}`;
+  openMessageModal();
+}
+
+function initGuidance() {
+  const attention = [
+    {name:'張大偉', subject:'數學', score:58, note:'需要加強'},
+    {name:'林建宏', subject:'國語', score:62, note:'閱讀理解'},
+    {name:'吳志明', subject:'英語', score:55, note:'詞彙不足'},
+  ];
+  document.getElementById('attention-students').innerHTML = attention.map(s => `
+    <div style="display:flex; align-items:center; gap:12px; padding:12px 0; border-bottom:1px dashed rgba(0,0,0,0.08);">
+      <div style="width:40px; height:40px; background:rgba(231,111,81,0.12); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:20px;">👤</div>
+      <div style="flex:1;">
+        <div style="font-weight:700; font-size:14px;">${s.name}</div>
+        <div style="font-size:12px; color:#888;">${s.subject} · ${s.note}</div>
+      </div>
+      <div style="text-align:right;">
+        <div style="font-size:20px; font-weight:900; color:var(--coral);">${s.score}</div>
+        <div style="font-size:10px; color:#888;">分</div>
+      </div>
+      <button class="btn btn-amber btn-sm" onclick="openGuidanceModal('${s.name}')">輔導</button>
+    </div>`).join('');
+
+  document.getElementById('guidance-records').innerHTML = store.guidance.map(g => `
+    <div style="padding:12px 0; border-bottom:1px dashed rgba(0,0,0,0.08);">
+      <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:4px;">
+        <div style="font-weight:700; font-size:14px;">${g.student} <span class="tag tag-sky">${g.type}</span></div>
+        <div style="font-size:11px; color:#888;">${g.date}</div>
+      </div>
+      <div style="font-size:13px; color:#555; line-height:1.5;">${g.content}</div>
+      <div style="font-size:12px; color:var(--jade); margin-top:4px;">📌 追蹤：${g.followup}</div>
+    </div>`).join('');
+}
+
+function initLessons() {
+  document.getElementById('lesson-list').innerHTML = store.lessons.map(l => `
+    <div class="card">
+      <div class="card-body" style="display:flex; gap:12px; align-items:flex-start;">
+        <div style="width:48px; height:48px; background:linear-gradient(135deg,var(--jade),var(--jade-light)); border-radius:var(--radius-sm); display:flex; align-items:center; justify-content:center; color:white; font-weight:900; font-size:12px; flex-shrink:0; text-align:center; line-height:1.2;">${l.subject}</div>
+        <div style="flex:1;">
+          <div style="font-weight:700; font-size:14px; margin-bottom:4px;">${l.title}</div>
+          <div style="font-size:12px; color:#888; margin-bottom:6px;">${l.date}</div>
+          <div style="font-size:12px; color:#555;">${l.goal}</div>
+        </div>
+        <span class="tag ${l.status==='完成'?'tag-green':'tag-amber'}">${l.status}</span>
+      </div>
+    </div>`).join('');
+}
+
+function initSubjectProgress() {
+  document.getElementById('subject-progress').innerHTML = subjectProgress.map(sp => `
+    <div class="progress-wrap">
+      <div class="progress-header">
+        <span class="progress-label">${sp.subject}</span>
+        <span class="progress-value">${sp.progress}%</span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill" style="width:${sp.progress}%; background:linear-gradient(to right, ${sp.color}, ${sp.color}88);"></div>
+      </div>
+    </div>`).join('');
+}
+
+function initClassRules() {
+  document.getElementById('class-rules-list').innerHTML = classRules.map(r => `
+    <div style="display:flex; align-items:center; gap:12px; padding:10px 0; border-bottom:1px dashed rgba(45,106,79,0.1);">
+      <span style="font-size:20px;">${r.icon}</span>
+      <span style="font-size:14px;">${r.rule}</span>
+    </div>`).join('');
+}
+
+function initTemplates() {
+  document.getElementById('msg-templates').innerHTML = store.templates.map(t => `
+    <div style="padding:12px 0; border-bottom:1px dashed rgba(0,0,0,0.08); display:flex; justify-content:space-between; align-items:center; gap:12px;">
+      <div>
+        <div style="font-weight:700; font-size:14px;">${t.title}</div>
+        <div style="font-size:12px; color:#888; margin-top:2px; line-height:1.4;">${t.content.substring(0,40)}...</div>
+      </div>
+      <button class="btn btn-primary btn-sm" onclick="useTemplate(${t.id})">使用</button>
+    </div>`).join('');
+}
+
+// ══════════════════════════════════════════════
+// PAGE NAVIGATION
+// ══════════════════════════════════════════════
+function switchPage(pageId, tabEl) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.bnav-btn').forEach(b => b.classList.remove('active'));
+
+  document.getElementById(`page-${pageId}`).classList.add('active');
+
+  // Update nav tab
+  document.querySelectorAll('.nav-tab').forEach(t => {
+    if (t.getAttribute('onclick') && t.getAttribute('onclick').includes(pageId)) t.classList.add('active');
+  });
+
+  // Update bottom nav
+  const bnav = document.getElementById(`bnav-${pageId}`);
+  if (bnav) bnav.classList.add('active');
+}
+
+// ══════════════════════════════════════════════
+// MODALS
+// ══════════════════════════════════════════════
+function openAttendanceModal() {
+  initStudentGrid('modal-student-grid');
+  document.getElementById('modal-attendance').classList.add('open');
+}
+function openMessageModal() {
+  document.getElementById('modal-message').classList.add('open');
+}
+function openNoticeModal() {
+  document.getElementById('modal-notice').classList.add('open');
+}
+function openSettingsModal() {
+  document.getElementById('modal-settings').classList.add('open');
+}
+function openGuidanceModal(studentName = '') {
+  if (studentName) document.getElementById('gd-student').value = studentName;
+  document.getElementById('modal-guidance').classList.add('open');
+}
+function openIndividualMsg() { openMessageModal(); }
+function openEventModal() {
+  document.getElementById('msg-subject').value = '班級活動邀請';
+  openMessageModal();
+}
+function openRulesModal() { showToast('📜 班規編輯功能'); }
+
+function closeModal(id) {
+  document.getElementById(`modal-${id}`).classList.remove('open');
+}
+
+// ══════════════════════════════════════════════
+// ACTIONS
+// ══════════════════════════════════════════════
+function saveLessonPlan() {
+  const title = document.getElementById('ls-title').value;
+  const subject = document.getElementById('ls-subject').value;
+  const date = document.getElementById('ls-date').value;
+  const goal = document.getElementById('ls-goal').value;
+  if (!title || !goal) { showToast('⚠️ 請填寫單元名稱與教學目標'); return; }
+  store.lessons.unshift({id: Date.now(), subject, date, title, goal, status: '進行中'});
+  initLessons();
+  clearLessonForm();
+  showToast('✅ 教案已儲存！');
+}
+
+function clearLessonForm() {
+  ['ls-title','ls-goal','ls-method','ls-flow','ls-resource','ls-eval'].forEach(id => {
+    document.getElementById(id).value = '';
+  });
+}
+
+function aiGenerateLesson() {
+  const subject = document.getElementById('ls-subject').value;
+  showToast('🤖 AI 正在生成教案建議...');
+  setTimeout(() => {
+    document.getElementById('ls-goal').value = `學生能夠理解${subject}本單元核心概念，並應用於實際情境中`;
+    document.getElementById('ls-method').value = '合作學習法、討論法、實作法';
+    document.getElementById('ls-flow').value = '1. 引起動機（5分鐘）：複習舊知識\n2. 教學活動（25分鐘）：講解新概念\n3. 小組討論（10分鐘）：合作練習\n4. 評量回饋（5分鐘）：口頭問答';
+    document.getElementById('ls-eval').value = '口頭問答、學習單、小組報告';
+    showToast('✨ AI 教案建議已填入！');
+  }, 1500);
+}
+
+function saveAttendance() {
+  closeModal('attendance');
+  showToast('✅ 出席記錄已儲存！');
+}
+
+function sendMessage() {
+  const subject = document.getElementById('msg-subject').value;
+  const content = document.getElementById('msg-content').value;
+  if (!subject || !content) { showToast('⚠️ 請填寫主旨和內容'); return; }
+  closeModal('message');
+  document.getElementById('msg-subject').value = '';
+  document.getElementById('msg-content').value = '';
+  showToast('📤 通知已發送給家長！');
+}
+
+function saveGuidance() {
+  const student = document.getElementById('gd-student').value;
+  const type = document.getElementById('gd-type').value;
+  const date = document.getElementById('gd-date').value;
+  const content = document.getElementById('gd-content').value;
+  const followup = document.getElementById('gd-followup').value;
+  if (!student || !content) { showToast('⚠️ 請填寫學生姓名和輔導內容'); return; }
+  store.guidance.unshift({student, type, date, content, followup});
+  initGuidance();
+  closeModal('guidance');
+  showToast('📝 輔導記錄已儲存！');
+}
+
+function saveNotice() {
+  const title = document.getElementById('nt-title').value;
+  const content = document.getElementById('nt-content').value;
+  const level = document.getElementById('nt-level').value;
+  if (!title || !content) { showToast('⚠️ 請填寫標題和內容'); return; }
+  const now = new Date();
+  store.notices.unshift({id: Date.now(), title, content, level, date: `${now.getMonth()+1}/${now.getDate()}`});
+  initNotices();
+  closeModal('notice');
+  document.getElementById('nt-title').value = '';
+  document.getElementById('nt-content').value = '';
+  showToast('📌 公告已發布！');
+}
+
+function saveSettings() {
+  closeModal('settings');
+  showToast('✅ 設定已儲存！');
+}
+
+function shuffleSeats() {
+  showToast('🔀 座位已重新排列！');
+}
+
+function useTemplate(id) {
+  const t = store.templates.find(t => t.id === id);
+  document.getElementById('msg-subject').value = t.title;
+  document.getElementById('msg-content').value = t.content;
+  openMessageModal();
+}
+
+// ══════════════════════════════════════════════
+// AI CHAT
+// ══════════════════════════════════════════════
+const aiResponses = {
+  '備課': '備課時建議從「學習目標→教學活動→評量方式」三個核心環節著手。您可以先利用本系統的備課功能，填入教學目標，再點選「AI輔助生成」讓我幫您規劃完整的教學流程！',
+  '班級': '有效的班級經營需要建立明確的班規與獎懲制度。建議您：1️⃣ 和學生共同訂定班規 2️⃣ 建立積分獎勵制度 3️⃣ 定期召開班會溝通 4️⃣ 善用座位安排促進合作學習。',
+  '家長': '與家長溝通的黃金原則：先從孩子的優點說起，再說明需要改進的地方，最後提出具體的合作方案。保持定期聯繫，不要只在出問題時才聯絡。',
+  '輔導': '對於學習落後的學生，建議採取差異化教學策略：1️⃣ 找出學習困難點 2️⃣ 設計個別學習計畫 3️⃣ 增加正向鼓勵 4️⃣ 善用同儕互助學習 5️⃣ 與家長保持密切聯繫。',
+  '評量': '設計評量時，建議採用多元評量方式，包含紙筆測驗、口頭問答、實作評量和作品集等。這樣能更全面地了解學生的學習狀況。',
+  '遊戲': '以下是幾個適合課堂的教學遊戲：\n🎯 分組搶答：將全班分組，出題搶答\n🎲 教學任務卡：設計不同難度任務\n🗺️ 學習探索地圖：用闖關方式完成學習\n請問您想在哪個科目使用遊戲活動呢？',
+  default: '感謝您的提問！作為您的教學助理，我隨時可以協助您：📚 備課設計、🏫 班級經營、📊 學習輔導、💬 親師溝通。請告訴我您目前最需要什麼幫助呢？'
+};
+
+function sendAiMessage() {
+  const input = document.getElementById('ai-input');
+  const msg = input.value.trim();
+  if (!msg) return;
+
+  const container = document.getElementById('ai-messages');
+  container.innerHTML += `<div class="ai-bubble user">${msg}</div>`;
+  input.value = '';
+
+  // Thinking animation
+  const thinkId = 'think-' + Date.now();
+  container.innerHTML += `<div id="${thinkId}" class="ai-thinking"><div class="think-dot"></div><div class="think-dot"></div><div class="think-dot"></div></div>`;
+  container.scrollTop = container.scrollHeight;
+
+  setTimeout(() => {
+    document.getElementById(thinkId)?.remove();
+    const key = Object.keys(aiResponses).find(k => k !== 'default' && msg.includes(k));
+    const response = aiResponses[key || 'default'];
+    container.innerHTML += `<div class="ai-bubble bot">${response}</div>`;
+    container.scrollTop = container.scrollHeight;
+  }, 1200);
+}
+
+function sendQuickPrompt(text) {
+  switchPage('ai', document.querySelector('[onclick*="\\'ai\\'"]'));
+  document.getElementById('ai-input').value = text;
+  sendAiMessage();
+}
+
+// ══════════════════════════════════════════════
+// TOAST
+// ══════════════════════════════════════════════
+function showToast(msg) {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 2800);
+}
+
+// ══════════════════════════════════════════════
+// PWA SERVICE WORKER
+// ══════════════════════════════════════════════
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+  });
+}
+</script>
+</body>
+</html>
