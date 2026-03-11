@@ -1,5 +1,5 @@
 // 幸福智多星 PWA Service Worker
-const CACHE_NAME = 'happy-star-teacher-v1';
+const CACHE_NAME = 'happy-star-teacher-v1.1';
 const CACHE_URLS = [
   './',
   './index.html',
